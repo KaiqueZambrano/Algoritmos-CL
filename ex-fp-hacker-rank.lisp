@@ -1,3 +1,5 @@
+; Exercícios do site Hacker Rank (programação funcional)
+
 ; 1: escreva hello world
 (defun helloworld ()
   (format t "Hello World~%"))
