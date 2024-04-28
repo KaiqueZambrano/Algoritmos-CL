@@ -102,13 +102,6 @@
 ; considerando uma lista de inteiros com N elementos,
 ; faça um filtro para remover os elementos em posição ímpar, imprimindo a lista resultante
 
-(defun imprimir-lista (lista)
-  (if (null lista)
-      nil
-      (progn
-        (format t "~d~%" (car lista))
-        (imprimir-lista (cdr lista)))))
-
 (defun ler-lista ()
   (let ((n (read *standard-input* nil)))
     (if (null n)
@@ -117,12 +110,50 @@
 
 (defun filtro (lista)
   (labels
-   ((aux (lista i novalista)
+      ((aux (lista i novalista)
          (cond ((null lista) (reverse novalista))
-               ((/= (mod i 2) 0) (progn (setf novalista (cons (car lista) novalista))
-                                        (aux (cdr lista) (+ i 1) novalista)))
+               ((/= (mod i 2) 0) (aux (cdr lista) (+ i 1) (cons (car lista) novalista)))
                (t (aux (cdr lista) (+ i 1) novalista)))))
     (aux lista 0 '())))
 
-(imprimir-lista (filtro (ler-lista)))
+(format t "~{~a~^~%~}" (filtro (ler-lista)))
+
+; (PROBLEMA 7)
+; considerando um inteiro N, faça uma função que retorne uma lista de inteiros com tamanho N,
+; imprimindo a lista resultante, onde:
+;    n: 1 <= n <= 100
+
+(defun lista-n-inteiros (n)
+  (labels
+      ((aux (i n lista)
+         (cond ((or (> i n) (< n 1) (> n 100)) (reverse lista))
+               (t (aux (+ i 1) n (cons i lista))))))
+    (aux 1 n '())))
+
+(format t "[~{~a~^, ~}]" (lista-n-inteiros (parse-integer (read-line))))
+
+; (PROBLEMA 8)
+; considerando uma lista de inteiros com N elementos, faça uma função que retorne uma nova lista 
+; no qual cada elemento X tem sua posição relativa invertida, imprimindo a lista resultante, onde:
+;    n: 1 <= n <= 100
+;    x: 0 <= x <= 100
+
+(defun ler-lista ()
+  (let ((x (read *standard-input* nil)))
+    (cond
+      ((null x) nil)
+      ((or (< x 0) (> x 100)) (ler-lista))
+      (t (cons x (ler-lista))))))
+
+(defun reverter (lista)
+  (labels
+      ((aux (lista novalista)
+         (cond ((null lista) novalista)
+               (t (aux (cdr lista) (cons (car lista) novalista))))))
+    (let ((n (length lista)))
+      (unless (or (< n 1) (> n 100))
+        (aux lista '())))))
+
+(format t "~{~a~^~%~}" (reverter (ler-lista)))
+
 
