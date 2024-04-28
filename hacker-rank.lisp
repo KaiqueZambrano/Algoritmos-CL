@@ -1,3 +1,10 @@
+; Problemas de programação funcional do site Hacker Rank, usando common lisp
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; O uso de recursos facilitadores como mapcar, reduce e filter são evitados para obter o aproveitamento máximo ;
+; dos exercícios, uma vez que essas implementações diferem em cada linguagem                                   ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ; (PROBLEMA 1)
 ; resolva a+b, onde :
 ;    a,b: 1 <= a,b <= 1000
@@ -32,8 +39,8 @@
 
 ; (PROBLEMA 4)
 ; considerando uma lista de inteiros com X elementos,
-; retorne uma nova lista repetindo cada elemento S vezes em posição relativa
-; e imprima a lista resultante, onde:
+; retorne uma nova lista repetindo cada elemento S vezes em posição relativa,
+; imprimindo a lista resultante, onde:
 ;    x: 0 <= x <= 10
 ;    s: 1 <= s <= 100
 
@@ -66,7 +73,7 @@
 ; (PROBLEMA 5)
 ; considerando uma lista de inteiros com B elementos,
 ; faça um filtro que compara cada elemento Y com uma restrição X,
-; e imprima a lista resultante, onde:
+; imprimindo a lista resultante, onde:
 ;    b: 0 <= b <= 100
 ;    y: -100 <= y <= 100
 ;    x: -100 <= x <= 100
@@ -90,4 +97,32 @@
         (t (filtro x (cdr lista))))))
 
 (let ((b 1)) (filtro (ler-x) (ler-lista b)))
+
+; (PROBLEMA 6)
+; considerando uma lista de inteiros com N elementos,
+; faça um filtro para remover os elementos em posição ímpar, imprimindo a lista resultante
+
+(defun imprimir-lista (lista)
+  (if (null lista)
+      nil
+      (progn
+        (format t "~d~%" (car lista))
+        (imprimir-lista (cdr lista)))))
+
+(defun ler-lista ()
+  (let ((n (read *standard-input* nil)))
+    (if (null n)
+        nil
+        (cons n (ler-lista)))))
+
+(defun filtro (lista)
+  (labels
+   ((aux (lista i novalista)
+         (cond ((null lista) (reverse novalista))
+               ((/= (mod i 2) 0) (progn (setf novalista (cons (car lista) novalista))
+                                        (aux (cdr lista) (+ i 1) novalista)))
+               (t (aux (cdr lista) (+ i 1) novalista)))))
+    (aux lista 0 '())))
+
+(imprimir-lista (filtro (ler-lista)))
 
