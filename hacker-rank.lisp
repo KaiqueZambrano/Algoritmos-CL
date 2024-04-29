@@ -1,79 +1,67 @@
 ; Problemas de programação funcional do site Hacker Rank, usando common lisp
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; O uso de recursos facilitadores como mapcar, reduce e filter são evitados para obter o aproveitamento máximo ;
-; dos exercícios, uma vez que essas implementações diferem em cada linguagem                                   ;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Alguns facilitadores como mapcar, reduce e filter são evitados para maximizar o aproveitamento dos exercícios
 
 ; (PROBLEMA 1)
-; resolva a+b, onde :
+; Resolver A+B, onde:
 ;    a,b: 1 <= a,b <= 1000
 
 (defun soma (a b)
-  (unless (or (< a 1) (< b 1) (> a 1000) (> b 1000)) 
+  (unless (or (< a 1) (> a 1000)
+              (< b 1) (> b 1000)) 
     (+ a b)))
 
 (format t "~d~%" (soma (parse-integer (read-line)) (parse-integer (read-line))))
 
 ; (PROBLEMA 2)
-; imprima hello world
+; Imprimir "Hello World"
 
 (defun helloworld ()
-    (format t "Hello World"))
+    (format t "Hello World~%"))
 
 (helloworld)
 
 ; (PROBLEMA 3)
-; imprima hello world n vezes, onde:
+; Imprimir "Hello World" N vezes, onde:
 ;    n: 0 <= n <= 50
 
-(defun n-helloworld (n)
-  (if (or (< n 0) (> n 50))
-      nil
-      (progn
-        (unless (= n 0)
-         (format t "Hello World~%"))
-        (n-helloworld (- n 1)))))
+(defun helloworld-n-vezes (n)
+  (if (or (<= n 0) (> n 50)) nil
+      (progn (format t "Hello World~%")
+             (helloworld-n-vezes (- n 1)))))
 
-(n-helloworld (parse-integer (read-line)))
+(helloworld-n-vezes (parse-integer (read-line)))
 
 ; (PROBLEMA 4)
-; considerando uma lista de inteiros com X elementos,
-; retorne uma nova lista repetindo cada elemento S vezes em posição relativa,
-; imprimindo a lista resultante, onde:
+; Considerando uma lista de inteiros com X elementos, retornar uma nova lista
+; onde cada elemento da lista original é repetido S vezes a partir de sua posição relativa.
+; Imprimir a lista resultante, na qual:
 ;    x: 0 <= x <= 10
 ;    s: 1 <= s <= 100
 
-(defun imprimir-lista (lista)
-  (if (null lista)
-      nil
-      (progn
-        (format t "~d~%" (car lista))
-        (imprimir-lista (cdr lista)))))
+(defun ler-lista ()
+  (labels
+      ((entrada (x)
+         (let ((n (read *standard-input* nil)))
+           (if (or (null n) (> x 10)) nil
+               (cons n (entrada (+ x 1)))))))
+    (entrada 1)))
 
-(defun ler-lista (&optional lista)
-  (let ((input (lambda ()
-                 (let ((n (read *standard-input* nil)))
-                   (if (null n)
-                       nil
-                       (cons n (ler-lista)))))))
-    (setf lista (funcall input))
-    (unless (or (< (length lista) 0) (> (length lista) 10)) lista)))
-
-(defun x-em-s-vezes (s lista &optional sx)
-  (if (or (null lista) (< s 1) (> s 100))
-      (reverse sx)
-      (progn
-        (dotimes (i s)
-          (setf sx (cons (car lista) sx)))
-        (x-em-s-vezes s (cdr lista) sx))))
-
-(imprimir-lista (x-em-s-vezes (parse-integer (read-line)) (ler-lista)))
+(defun x-em-s-vezes (s lista)
+  (labels
+      ((repete (s lista novalista)
+         (if (<= s 0) novalista
+             (repete (- s 1) lista (cons (car lista) novalista))))
+       (percorre (s lista novalista)
+         (if (or (null lista) (< s 1) (> s 100))
+             (reverse novalista)
+             (percorre s (cdr lista) (repete s lista novalista)))))
+    (percorre s lista '())))
+    
+(format t "~{~a~^~%~}" (x-em-s-vezes (parse-integer (read-line)) (ler-lista)))
 
 ; (PROBLEMA 5)
-; considerando uma lista de inteiros com B elementos,
-; faça um filtro que compara cada elemento Y com uma restrição X,
-; imprimindo a lista resultante, onde:
+; Considerando uma lista de inteiros com B elementos, filtrar cada elemento Y de acordo
+; com a restrição (Y < X). Imprimir lista resultante, na qual: 
 ;    b: 0 <= b <= 100
 ;    y: -100 <= y <= 100
 ;    x: -100 <= x <= 100
@@ -90,22 +78,22 @@
       (t (cons y (ler-lista (+ b 1)))))))
 
 (defun filtro (x lista)
-  (if (or (null x) (null lista))
-      nil
-      (cond
-        ((< (car lista) x) (progn (format t "~d~%" (car lista)) (filtro x (cdr lista))))
-        (t (filtro x (cdr lista))))))
+  (if (or (null x) (null lista)) nil
+      (if (< (car lista) x)
+          (progn
+            (format t "~d~%" (car lista))
+            (filtro x (cdr lista)))
+          (filtro x (cdr lista)))))
 
-(let ((b 1)) (filtro (ler-x) (ler-lista b)))
+(filtro (ler-x) (ler-lista 1))
 
 ; (PROBLEMA 6)
-; considerando uma lista de inteiros com N elementos,
-; faça um filtro para remover os elementos em posição ímpar, imprimindo a lista resultante
+; Considerando uma lista de inteiros com N elementos, filtrar as posições ímpares.
+; Imprimir a lista resultante.
 
 (defun ler-lista ()
   (let ((n (read *standard-input* nil)))
-    (if (null n)
-        nil
+    (if (null n) nil
         (cons n (ler-lista)))))
 
 (defun filtro (lista)
@@ -119,22 +107,24 @@
 (format t "~{~a~^~%~}" (filtro (ler-lista)))
 
 ; (PROBLEMA 7)
-; considerando um inteiro N, faça uma função que retorne uma lista de inteiros com tamanho N,
-; imprimindo a lista resultante, onde:
+; Considerando um inteiro N, retornar uma lista de inteiros com N elementos.
+; Imprimir lista resultante, na qual:
 ;    n: 1 <= n <= 100
 
 (defun lista-n-inteiros (n)
   (labels
       ((aux (i n lista)
-         (cond ((or (> i n) (< n 1) (> n 100)) (reverse lista))
-               (t (aux (+ i 1) n (cons i lista))))))
+         (if (or (> i n) (< n 1) (> n 100))
+             (reverse lista)
+             (aux (+ i 1) n (cons i lista))))) 
     (aux 1 n '())))
 
 (format t "[~{~a~^, ~}]" (lista-n-inteiros (parse-integer (read-line))))
 
 ; (PROBLEMA 8)
-; considerando uma lista de inteiros com N elementos, faça uma função que retorne uma nova lista 
-; no qual cada elemento X tem sua posição relativa invertida, imprimindo a lista resultante, onde:
+; Considerando uma lista de inteiros com N elementos, retornar uma nova lista 
+; onde a posição relativa de cada elemento X é o inverso da lista original.
+; Imprimir lista resultante, na qual:
 ;    n: 1 <= n <= 100
 ;    x: 0 <= x <= 100
 
@@ -148,12 +138,12 @@
 (defun reverter (lista)
   (labels
       ((aux (lista novalista)
-         (cond ((null lista) novalista)
-               (t (aux (cdr lista) (cons (car lista) novalista))))))
+         (if (null lista) novalista
+             (aux (cdr lista) (cons (car lista) novalista)))))
     (let ((n (length lista)))
       (unless (or (< n 1) (> n 100))
         (aux lista '())))))
 
 (format t "~{~a~^~%~}" (reverter (ler-lista)))
 
-
+;
